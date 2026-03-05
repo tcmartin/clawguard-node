@@ -1,0 +1,36 @@
+{
+  "name": "clawguard-node",
+  "version": "0.1.0",
+  "description": "ClawGuard threat gate for prompts and skills (Node CLI)",
+  "type": "module",
+  "bin": {
+    "clawguard": "./bin/clawguard.mjs"
+  },
+  "main": "./src/index.mjs",
+  "exports": {
+    ".": "./src/index.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "data",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test",
+    "scan:examples": "node ./bin/clawguard.mjs scan ./examples",
+    "evaluate": "node ./bin/clawguard.mjs evaluate"
+  },
+  "keywords": [
+    "security",
+    "prompt-injection",
+    "agent",
+    "skills",
+    "guardrail"
+  ],
+  "license": "MIT"
+}

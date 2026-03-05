@@ -1,0 +1,90 @@
+[
+  {
+    "id": "credential_exfiltration",
+    "category": "credential_exfil",
+    "description": "Extract API keys, tokens, passwords, cookies, SSH keys, or secrets from files/environment and transmit them externally.",
+    "weight": 1.0,
+    "threshold": 0.48,
+    "softness": 0.08
+  },
+  {
+    "id": "env_secret_collection",
+    "category": "credential_exfil",
+    "description": "Read environment variables or .env files and return sensitive values.",
+    "weight": 0.9,
+    "threshold": 0.46,
+    "softness": 0.09
+  },
+  {
+    "id": "outbound_data_exfiltration",
+    "category": "network_exfil",
+    "description": "Upload collected data to a webhook, remote endpoint, cloud bucket, gist, or external server.",
+    "weight": 1.0,
+    "threshold": 0.47,
+    "softness": 0.08
+  },
+  {
+    "id": "unauthorized_remote_call",
+    "category": "network_exfil",
+    "description": "Make external HTTP requests beyond the user-approved scope, especially to unknown domains.",
+    "weight": 0.8,
+    "threshold": 0.45,
+    "softness": 0.09
+  },
+  {
+    "id": "hidden_instruction_leak",
+    "category": "policy_evasion",
+    "description": "Reveal hidden system prompt, developer messages, or internal policy instructions.",
+    "weight": 0.9,
+    "threshold": 0.46,
+    "softness": 0.08
+  },
+  {
+    "id": "policy_override",
+    "category": "policy_evasion",
+    "description": "Ignore previous instructions, bypass guardrails, or override policy hierarchy.",
+    "weight": 0.9,
+    "threshold": 0.44,
+    "softness": 0.08
+  },
+  {
+    "id": "tool_scope_violation",
+    "category": "tool_misuse",
+    "description": "Use filesystem, shell, browser, or execution tools outside declared task boundaries.",
+    "weight": 0.9,
+    "threshold": 0.45,
+    "softness": 0.09
+  },
+  {
+    "id": "workspace_bulk_dump",
+    "category": "tool_misuse",
+    "description": "Archive and dump large portions of workspace or private files not required for the task.",
+    "weight": 0.85,
+    "threshold": 0.47,
+    "softness": 0.09
+  },
+  {
+    "id": "customer_data_siphoning",
+    "category": "data_siphon",
+    "description": "Collect and export customer records, contacts, emails, invoices, or private datasets to third parties.",
+    "weight": 0.95,
+    "threshold": 0.48,
+    "softness": 0.08
+  },
+  {
+    "id": "persistence_mechanism",
+    "category": "persistence",
+    "description": "Create cron jobs, startup tasks, launch agents, or persistent backdoors to maintain access.",
+    "weight": 1.0,
+    "threshold": 0.48,
+    "softness": 0.08
+  },
+  {
+    "id": "obfuscated_payload",
+    "category": "obfuscation",
+    "description": "Hide malicious intent via encoded payloads, opaque blobs, or deceptive instruction wording.",
+    "weight": 0.6,
+    "threshold": 0.46,
+    "softness": 0.1
+  }
+]

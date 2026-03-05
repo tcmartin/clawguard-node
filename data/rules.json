@@ -1,0 +1,296 @@
+[
+  {
+    "id": "ask_for_secrets",
+    "category": "credential_exfil",
+    "pattern": "\\b(api[\\s_-]?key|access[\\s_-]?key|token|password|credential|cookie|private key)\\b",
+    "weight": 0.3,
+    "flags": "i"
+  },
+  {
+    "id": "env_access",
+    "category": "credential_exfil",
+    "pattern": "(?:\\.env\\b|os\\.environ|printenv\\b|env\\[[\\\"'])",
+    "weight": 0.35,
+    "flags": "i"
+  },
+  {
+    "id": "ssh_key_access",
+    "category": "credential_exfil",
+    "pattern": "(?:\\.ssh\\b|id_rsa\\b|authorized_keys\\b)",
+    "weight": 0.45,
+    "flags": "i"
+  },
+  {
+    "id": "cloud_credential_sources",
+    "category": "credential_exfil",
+    "pattern": "(?:\\.aws/credentials|aws_access_key_id|aws_secret_access_key|metadata\\.google\\.internal|169\\.254\\.169\\.254|latest/meta-data|serviceaccount\\.json|kubeconfig|\\.netrc\\b|\\.pypirc\\b|\\.npmrc\\b)",
+    "weight": 0.45,
+    "flags": "i"
+  },
+  {
+    "id": "private_key_material",
+    "category": "credential_exfil",
+    "pattern": "-----BEGIN (?:RSA |EC |OPENSSH |DSA |PGP )?PRIVATE KEY-----|xox[baprs]-[A-Za-z0-9-]{10,}|ghp_[A-Za-z0-9]{30,}|jwt\\.pem|sign(?:ing|er)[_-]?key|id_ed25519",
+    "weight": 0.62,
+    "flags": "i"
+  },
+  {
+    "id": "external_exfil_endpoint",
+    "category": "network_exfil",
+    "pattern": "\\b(webhook|exfiltrat|send to .*https?://|upload to .*https?://|post to .*https?://)\\b",
+    "weight": 0.45,
+    "flags": "i"
+  },
+  {
+    "id": "secret_collection_then_transfer",
+    "category": "network_exfil",
+    "pattern": "\\b(extract|collect|dump|read)\\b[\\s\\S]{0,80}\\b(secrets?|tokens?|credentials?|api[\\s_-]?keys?|\\.env)\\b[\\s\\S]{0,140}\\b(curl|wget|requests?\\s*\\.\\s*post|https?://)\\b",
+    "weight": 0.62,
+    "flags": "i"
+  },
+  {
+    "id": "python_http_exfil",
+    "category": "network_exfil",
+    "pattern": "\\b(requests|httpx|aiohttp)\\s*\\.\\s*(post|put|request|get)\\b[\\s\\S]{0,140}https?://",
+    "weight": 0.58,
+    "flags": "i"
+  },
+  {
+    "id": "curl_wget",
+    "category": "network_exfil",
+    "pattern": "\\b(curl|wget|Invoke-WebRequest)\\b",
+    "weight": 0.3,
+    "flags": "i"
+  },
+  {
+    "id": "split_token_download_tools",
+    "category": "network_exfil",
+    "pattern": "\\bc[\\W_]*u[\\W_]*r[\\W_]*l\\b|\\bw[\\W_]*g[\\W_]*e[\\W_]*t\\b|\\bi[\\W_]*w[\\W_]*r\\b",
+    "weight": 0.42,
+    "flags": "i"
+  },
+  {
+    "id": "ifs_obfuscated_download_tool",
+    "category": "network_exfil",
+    "pattern": "\\bc\\$\\{?ifs\\}?url\\b|\\bw\\$\\{?ifs\\}?get\\b|\\bi\\$\\{?fs\\}?w\\$\\{?fs\\}?r\\b",
+    "weight": 0.6,
+    "flags": "i"
+  },
+  {
+    "id": "external_url",
+    "category": "network_exfil",
+    "pattern": "https?://[^\\s)>\\\"]+",
+    "weight": 0.2,
+    "flags": "i"
+  },
+  {
+    "id": "exfil_platform_destinations",
+    "category": "network_exfil",
+    "pattern": "\\b(discord(?:app)?\\.com/api/webhooks|pastebin\\.com|gist\\.github\\.com|transfer\\.sh|file\\.io|telegra\\.ph|telegram\\.me|api\\.telegram\\.org|hooks\\.slack\\.com/services|webhook\\.office\\.com|slack\\.com/api/webhook)\\b",
+    "weight": 0.5,
+    "flags": "i"
+  },
+  {
+    "id": "dns_exfiltration",
+    "category": "network_exfil",
+    "pattern": "\\b(nslookup|dig|host)\\b[\\s\\S]{0,180}\\b(exfil|chunk|base64|attacker|c2|command-and-control|\\.tld)\\b",
+    "weight": 0.55,
+    "flags": "i"
+  },
+  {
+    "id": "internal_target_probe",
+    "category": "network_exfil",
+    "pattern": "\\b(localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0|10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|192\\.168\\.\\d{1,3}\\.\\d{1,3}|172\\.(?:1[6-9]|2\\d|3[0-1])\\.\\d{1,3}\\.\\d{1,3})\\b",
+    "weight": 0.3,
+    "flags": "i"
+  },
+  {
+    "id": "remote_exec_pipe",
+    "category": "network_exfil",
+    "pattern": "\\b(curl|wget)\\b[^\\n|;]{0,160}\\|\\s*(bash|sh|zsh|python3?|perl)\\b",
+    "weight": 0.62,
+    "flags": "i"
+  },
+  {
+    "id": "powershell_encoded_exec",
+    "category": "network_exfil",
+    "pattern": "\\b(iwr|invoke-webrequest)\\b[^\\n|;]{0,160}\\|\\s*iex\\b|\\bpowershell(?:\\.exe)?\\b[^\\n]{0,160}\\s-enc(?:odedcommand)?\\b",
+    "weight": 0.62,
+    "flags": "i"
+  },
+  {
+    "id": "obfuscated_command_staging",
+    "category": "network_exfil",
+    "pattern": "\\b(printf|fromcharcode|chr\\s*\\(|concat(?:enate)?|join)\\b[\\s\\S]{0,140}\\b(curl|wget|bash|sh|powershell|invoke-webrequest)\\b",
+    "weight": 0.52,
+    "flags": "i"
+  },
+  {
+    "id": "net_transfer_tools",
+    "category": "network_exfil",
+    "pattern": "\\b(nc|ncat|netcat|scp|sftp|rsync|ftp|tftp|dnscat2|iodine|rclone)\\b",
+    "weight": 0.34,
+    "flags": "i"
+  },
+  {
+    "id": "remote_transfer_target",
+    "category": "network_exfil",
+    "pattern": "\\b(scp|sftp|rsync)\\b[\\s\\S]{0,120}\\b([A-Za-z0-9._-]+@[A-Za-z0-9._-]+|(?:\\d{1,3}\\.){3}\\d{1,3}|attacker|dropbox|mega\\.nz)\\b",
+    "weight": 0.52,
+    "flags": "i"
+  },
+  {
+    "id": "archive_encrypt_stage_exfil",
+    "category": "network_exfil",
+    "pattern": "\\b(tar|zip|7z)\\b[\\s\\S]{0,140}\\b(openssl\\s+enc|gpg\\s+-c|age\\s+-p)\\b[\\s\\S]{0,140}\\b(scp|sftp|rsync|curl|wget|rclone|nc)\\b",
+    "weight": 0.62,
+    "flags": "i"
+  },
+  {
+    "id": "policy_override",
+    "category": "policy_evasion",
+    "pattern": "\\b(ignore (all|any|previous)|override (policy|rules?)|reveal (system|developer) prompt)\\b",
+    "weight": 0.45,
+    "flags": "i"
+  },
+  {
+    "id": "indirect_priority_override",
+    "category": "policy_evasion",
+    "pattern": "\\b(priority (?:instruction|update)|supervisor channel|highest authority|new top-level directive)\\b[\\s\\S]{0,90}\\b(supersed(?:e|es|ed|ing)?|overrid(?:e|es|ing)?|ignore|disregard)\\b",
+    "weight": 0.58,
+    "flags": "i"
+  },
+  {
+    "id": "jailbreak_language",
+    "category": "policy_evasion",
+    "pattern": "\\b(jailbreak|dan mode|developer mode|unfiltered mode|without safeguards|forget (all )?previous instructions)\\b",
+    "weight": 0.4,
+    "flags": "i"
+  },
+  {
+    "id": "role_impersonation_override",
+    "category": "policy_evasion",
+    "pattern": "\\b(pretend (you are|to be) (system|developer|admin|root)|you are now (system|admin|root)|act as root)\\b",
+    "weight": 0.42,
+    "flags": "i"
+  },
+  {
+    "id": "instruction_block_smuggling",
+    "category": "policy_evasion",
+    "pattern": "</?\\s*(instructions?|system|developer|policy|prompt)\\s*>",
+    "weight": 0.38,
+    "flags": "i"
+  },
+  {
+    "id": "hidden_prompt_leak",
+    "category": "policy_evasion",
+    "pattern": "\\b(system prompt|developer message|hidden instructions?)\\b",
+    "weight": 0.3,
+    "flags": "i"
+  },
+  {
+    "id": "shell_exec",
+    "category": "tool_misuse",
+    "pattern": "\\b(exec|subprocess|bash -c|sh -c|powershell|shell command)\\b",
+    "weight": 0.35,
+    "flags": "i"
+  },
+  {
+    "id": "filesystem_dump",
+    "category": "tool_misuse",
+    "pattern": "\\b(cat /|tar cz|zip -r|copy entire|dump workspace|read all files)\\b",
+    "weight": 0.4,
+    "flags": "i"
+  },
+  {
+    "id": "stealth_step_smuggling",
+    "category": "tool_misuse",
+    "pattern": "\\b(hidden step|without (mentioning|telling)|silently|covert(?:ly)?|stealth(?:ily)?|quietly in the background)\\b[\\s\\S]{0,120}\\b(upload|exfiltrat|send|tar|archive|shell)\\b",
+    "weight": 0.55,
+    "flags": "i"
+  },
+  {
+    "id": "privilege_escalation",
+    "category": "tool_misuse",
+    "pattern": "\\b(sudo\\s+-S|chmod\\s+\\+s|setuid|/etc/sudoers|runas\\s+/user:administrator)\\b",
+    "weight": 0.58,
+    "flags": "i"
+  },
+  {
+    "id": "log_tampering",
+    "category": "tool_misuse",
+    "pattern": "\\b(history\\s+-c|rm\\s+-rf\\s+/var/log|truncate\\s+-s\\s+0\\s+/var/log|wevtutil\\s+cl)\\b",
+    "weight": 0.48,
+    "flags": "i"
+  },
+  {
+    "id": "db_dump_export",
+    "category": "data_siphon",
+    "pattern": "\\b(pg_dump|mysqldump|mongoexport|sqlite3\\s+\\S+\\s+\\.dump)\\b",
+    "weight": 0.46,
+    "flags": "i"
+  },
+  {
+    "id": "pii_or_financial_data",
+    "category": "data_siphon",
+    "pattern": "\\b(ssn|social security number|passport number|credit card|cvv|bank account|medical record|phi|pii|payroll)\\b",
+    "weight": 0.42,
+    "flags": "i"
+  },
+  {
+    "id": "mass_customer_export",
+    "category": "data_siphon",
+    "pattern": "\\b(export|dump|copy|download)\\b[\\s\\S]{0,80}\\b(customers?|contacts?|emails?|invoices?|crm|ticket history)\\b",
+    "weight": 0.44,
+    "flags": "i"
+  },
+  {
+    "id": "persistence",
+    "category": "persistence",
+    "pattern": "\\b(cron|systemd|launchd|startup task|scheduled task|autostart)\\b",
+    "weight": 0.55,
+    "flags": "i"
+  },
+  {
+    "id": "startup_modification",
+    "category": "persistence",
+    "pattern": "\\b(\\.bashrc|\\.zshrc|/etc/rc\\.local|launchctl load|systemctl enable|reg add .*\\\\run|schtasks /create)\\b",
+    "weight": 0.52,
+    "flags": "i"
+  },
+  {
+    "id": "beaconing_language",
+    "category": "persistence",
+    "pattern": "\\b(beacon|heartbeat)\\b[\\s\\S]{0,40}\\b(every minute|every 30 seconds|periodic|persist)\\b",
+    "weight": 0.46,
+    "flags": "i"
+  },
+  {
+    "id": "obfuscated_blob",
+    "category": "obfuscation",
+    "pattern": "\\b[A-Za-z0-9+/]{160,}={0,2}\\b",
+    "weight": 0.2,
+    "flags": ""
+  },
+  {
+    "id": "encoded_execution",
+    "category": "obfuscation",
+    "pattern": "\\b(base64\\s+-d|base64 --decode|frombase64string|xxd -r -p|certutil -decode|openssl enc -d|atob\\(|fromcharcode)\\b",
+    "weight": 0.36,
+    "flags": "i"
+  },
+  {
+    "id": "public_share_destination",
+    "category": "network_exfil",
+    "pattern": "\\b(upload|share|post)\\b[\\s\\S]{0,120}\\b(public (?:gist|share|link)|gist\\b|dropbox|public-share|publicly accessible)\\b",
+    "weight": 0.45,
+    "flags": "i"
+  },
+  {
+    "id": "support_bundle_collection",
+    "category": "tool_misuse",
+    "pattern": "\\b(collect|prepare|gather)\\b[\\s\\S]{0,80}\\b(debug logs?|support bundle)\\b",
+    "weight": 0.22,
+    "flags": "i"
+  }
+]
