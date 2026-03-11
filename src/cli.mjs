@@ -1,5 +1,5 @@
-import { readFileSync, readdirSync, statSync } from "node:fs";
-import { resolve, extname, join } from "node:path";
+import { readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import { resolve, extname, join, basename, dirname } from "node:path";
 import { spawnSync } from "node:child_process";
 import { ClawGuardScanner, parseSeverity, SEVERITY_ORDER } from "./scanner.mjs";
 import { loadDefaultEvalCases } from "./resources.mjs";
@@ -122,12 +122,19 @@ function runDatafilter(text, opts) {
   };
 }
 
+function sanitizedPath(target) {
+  const ext = extname(target);
+  const base = basename(target, ext);
+  return join(dirname(target), `${base}_SANITIZED${ext}`);
+}
+
 function collectTargets(paths) {
   const out = new Set();
 
   function walk(p) {
     const st = statSync(p);
     if (st.isFile()) {
+      if (basename(p, extname(p)).endsWith("_SANITIZED")) return;
       out.add(p);
       return;
     }
@@ -138,6 +145,7 @@ function collectTargets(paths) {
         walk(child);
       } else if (cst.isFile()) {
         const ext = extname(child).toLowerCase();
+        if (basename(child, extname(child)).endsWith("_SANITIZED")) continue;
         if (ALLOWED_EXT.has(ext)) out.add(child);
       }
     }
@@ -183,15 +191,30 @@ export function runCli(argv = process.argv.slice(2)) {
       const text = readFileSync(t, "utf8");
       const original = scanner.scanText(text, { target: t });
       if (!opts.datafilter) return original;
+      if (original.reject) {
+        return {
+          ...original,
+          datafilter: {
+            enabled: true,
+            applied: false,
+            skipped_reason: "raw_reject",
+            original_risk: original.risk,
+          },
+        };
+      }
       const filtered = runDatafilter(text, opts);
       const sanitized = scanner.scanText(filtered.sanitizedText, { target: t });
       const merged = mergeResults(t, original, sanitized);
+      const outPath = sanitizedPath(t);
+      writeFileSync(outPath, filtered.sanitizedText, "utf8");
       merged.datafilter = {
         enabled: true,
+        applied: true,
         changed: filtered.changed,
         removed_ratio: filtered.removedRatio,
         original_risk: original.risk,
         sanitized_risk: sanitized.risk,
+        sanitized_path: outPath,
       };
       return merged;
     });
@@ -214,16 +237,29 @@ export function runCli(argv = process.argv.slice(2)) {
     const original = scanner.scanText(text, { target: "<inline>" });
     let result = original;
     if (opts.datafilter) {
-      const filtered = runDatafilter(text, opts);
-      const sanitized = scanner.scanText(filtered.sanitizedText, { target: "<inline>" });
-      result = mergeResults("<inline>", original, sanitized);
-      result.datafilter = {
-        enabled: true,
-        changed: filtered.changed,
-        removed_ratio: filtered.removedRatio,
-        original_risk: original.risk,
-        sanitized_risk: sanitized.risk,
-      };
+      if (original.reject) {
+        result = {
+          ...original,
+          datafilter: {
+            enabled: true,
+            applied: false,
+            skipped_reason: "raw_reject",
+            original_risk: original.risk,
+          },
+        };
+      } else {
+        const filtered = runDatafilter(text, opts);
+        const sanitized = scanner.scanText(filtered.sanitizedText, { target: "<inline>" });
+        result = mergeResults("<inline>", original, sanitized);
+        result.datafilter = {
+          enabled: true,
+          applied: true,
+          changed: filtered.changed,
+          removed_ratio: filtered.removedRatio,
+          original_risk: original.risk,
+          sanitized_risk: sanitized.risk,
+        };
+      }
     }
 
     if (opts.format === "json") {

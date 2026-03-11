@@ -3,7 +3,7 @@ process.stdin.on("data", (d) => { buf += d.toString(); });
 process.stdin.on("end", () => {
   const payload = JSON.parse(buf || "{}");
   const input = String(payload.text || "");
-  const sanitized = input.replace(/ignore previous instructions?/gi, "[removed]");
+  const sanitized = input.replace(/SAFE_MARKER/gi, "[removed]");
   process.stdout.write(JSON.stringify({
     sanitized_text: sanitized,
     changed: sanitized !== input,

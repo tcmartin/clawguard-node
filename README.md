@@ -30,6 +30,8 @@ npx clawguard-node scan ./prompts --datafilter
 ```
 
 Node calls an external command only when `--datafilter` is set.
+It scans the original text first. If raw text is already blocked, that verdict is final. Otherwise it scans the sanitized output too, keeps the higher-risk verdict, and writes a companion file such as `SKILL_SANITIZED.md` for downstream use.
+
 Default bridge command:
 
 ```bash
@@ -61,6 +63,15 @@ console.log(result);
 
 - This Node package ships a lightweight local semantic backend (token cosine) and the full ClawGuard rule corpus.
 - It does not require remote model downloads.
+
+## Acknowledgments
+
+Optional DataFilter bridging is inspired by:
+
+- Yizhu Wang, Sizhe Chen, Raghad Alkhudair, Basel Alomair, David Wagner, "Defending Against Prompt Injection with DataFilter", UC Berkeley and KACST, 2025.
+- Paper: https://arxiv.org/html/2510.19207v1
+
+The Node bridge follows the same safety model as the Python package: scan raw text first, treat raw reject as final, then optionally sanitize non-blocked content and rescan it.
 
 ## License
 
